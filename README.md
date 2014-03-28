@@ -1,6 +1,6 @@
 # Rwepay
 
-TODO: Write a gem description
+微信支付 Wechat Pay Ruby SDK Gem
 
 ## Installation
 
@@ -18,11 +18,11 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+ [Ralipay(支付宝PaymentGem)](https://github.com/RaymondChou/ralipay)姊妹篇，微信支付SDK
 
 ## Contributing
 
-1. Fork it ( http://github.com/<my-github-username>/Rwepay/fork )
+1. Fork it ( http://github.com/RaymondChou/Rwepay/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
