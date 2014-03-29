@@ -73,7 +73,7 @@ module Rwepay
       begin
         response = Faraday.get("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=#{@configs[:app_id]}&secret=#{app_secret}")
         response = JSON.parse response.body
-        if response['access_token'].present?
+        if response['access_token'] != nil
           response['access_token']
         else
           false
