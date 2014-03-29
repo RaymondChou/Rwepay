@@ -80,20 +80,22 @@ module Rwepay::Common
   end
 
   def self.creat_notify_sign_string(params = {})
-    key = params[:key]
+    key = params['key']
     result_string = ''
     sign_params = params.sort
     sign_params.each do |key, value|
-      unless value.nil? or value == '' or key.to_s == 'xml' or key.to_s == 'sign' or key.to_s == 'action'or key.to_s == 'controller'
+      unless value.nil? or value == '' or key.to_s == 'key' or key.to_s == 'xml' or key.to_s == 'sign' or key.to_s == 'action'or key.to_s == 'controller'
         result_string += (key.to_s + '=' + value.to_s + '&')
       end
     end
+
     "#{result_string}key=#{key}"
   end
 
   def self.notify_sign(sign_params = {})
     for_sign_string = creat_notify_sign_string sign_params
     md5_signed_string = md5_sign for_sign_string
+
     md5_signed_string
   end
 

@@ -42,8 +42,8 @@ module Rwepay
     end
 
     def notify_verify?(params = {})
-      params[:key] ||= @configs[:partner_key]
-      Rwepay::Common.notify_sign(params) == params[:sign] and params[:trade_state] == '0'
+      params['key'] ||= @configs[:partner_key]
+      Rwepay::Common.notify_sign(params) == params['sign'] and params['trade_state'] == '0'
     end
 
     def deliver_notify()
