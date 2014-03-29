@@ -1,5 +1,7 @@
 # Rwepay
 
+[![Build Status](https://travis-ci.org/RaymondChou/Rwepay.svg?branch=master)](https://travis-ci.org/RaymondChou/Rwepay)
+
 微信支付 Wechat Pay Ruby SDK Gem
 
 ## Installation
