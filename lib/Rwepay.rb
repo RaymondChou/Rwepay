@@ -48,7 +48,7 @@ module Rwepay
 
     def deliver_notify(options = {})
       options = Rwepay::Common.configs_check options,
-                [:access_token, :open_id, :trans_id, :out_trade_no, :deliver_timestamp, :deliver_status, :deliver_msg]
+                                             [:access_token, :open_id, :trans_id, :out_trade_no, :deliver_timestamp, :deliver_status, :deliver_msg]
 
       options[:app_id]  = @configs[:app_id]
       options[:app_key] = @configs[:app_key]
@@ -58,7 +58,7 @@ module Rwepay
 
     def get_order_query(options = {})
       options = Rwepay::Common.configs_check options,
-                [:access_token, :out_trade_no]
+                                             [:access_token, :out_trade_no]
 
       options[:app_id]      = @configs[:app_id]
       options[:app_key]     = @configs[:app_key]

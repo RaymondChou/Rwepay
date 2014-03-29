@@ -16,7 +16,7 @@ module Rwepay::Common
   end
 
   def self.get_nonce_str
-    SecureRandom.hex 32
+    SecureRandom.hex 16
   end
 
   def self.create_sign_string(sign_params = {}, sort = true)
@@ -34,6 +34,21 @@ module Rwepay::Common
     }
 
     "#{result_string}key=#{key}"
+  end
+
+  def self.create_pay_sign_string(sign_params = {}, sort = true)
+    result_string = ''
+    key = sign_params[:key]
+    #是否排序
+    if sort
+      sign_params = sign_params.sort
+    end
+
+    sign_params.each{|key,value|
+      result_string += (key.to_s + '=' + value.to_s + '&')
+    }
+
+    result_string[0, result_string.length - 1]
   end
 
   def self.md5_sign(for_sign_string)
@@ -71,7 +86,7 @@ module Rwepay::Common
 
   #sign_string :appid, :appkey, :noncestr, :package, :timestamp
   def self.pay_sign(sign_params = {})
-    for_sign_string    = create_sign_string sign_params
+    for_sign_string    = create_pay_sign_string sign_params
     sha1_signed_string = sha1_sign for_sign_string
     sha1_signed_string
   end
