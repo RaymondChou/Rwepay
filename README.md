@@ -20,6 +20,10 @@ Or install it yourself as:
 
  [Ralipay(支付宝PaymentGem)](https://github.com/RaymondChou/ralipay)姊妹篇，微信支付SDK
 
+ 示例中的账号信息是微信提供的测试数据，你需要使用自己的账号信息才可以完成测试：）
+
+ 特别要注意的一点，千万不要将微信提供的js demo使用在产品环境，那是非常不安全的。notify回调校验请严格使用notify_verify?方法进行。
+
 ## Contributing
 
 1. Fork it ( http://github.com/RaymondChou/Rwepay/fork )
