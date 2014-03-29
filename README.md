@@ -30,19 +30,19 @@ Or install it yourself as:
 
 ## Usage
 
-  ### JSPayment
+### JSPayment
 
-  - 创建支付请求 [get_brand_request]
+- 创建支付请求 [get_brand_request]
 
-  - 回调验证 [notify_verify?]
+- 回调验证 [notify_verify?]
 
-  - 发货通知 [deliver_notify]
+- 发货通知 [deliver_notify]
 
-  - 获取订单状态 [get_order_query]
+- 获取订单状态 [get_order_query]
 
-  - 获取access_token [get_access_token]
+- 获取access_token [get_access_token]
 
-  ### NativePayment
+### NativePayment
 
   TODO
 
