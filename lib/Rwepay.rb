@@ -40,6 +40,11 @@ module Rwepay
       )
       final_params.to_json
     end
+
+    def notify_verify
+
+      #return status, data
+    end
   end
 
   class NativePayment

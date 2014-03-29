@@ -3,6 +3,7 @@ module Rwepay::Common
   require 'digest/sha1'
   require 'digest/md5'
   require 'securerandom'
+  require 'uri'
 
   def self.configs_check(configs = {}, requires = [])
     requires.each do |require|
@@ -21,6 +22,7 @@ module Rwepay::Common
     #对原串进行签名，注意这里不要对任何字段进行编码。这里是将参数按照key=value进行字典排序后组成下面的字符串,在这个字符串最后拼接上key=XXXX。由于这里的字段固定，因此只需要按照这个顺序进行排序即可。
 
     result_string = ''
+    key = sign_params[:key]
     #是否排序
     if sort
       sign_params = sign_params.sort
@@ -30,7 +32,7 @@ module Rwepay::Common
       result_string += (key.to_s + '=' + value.to_s + '&') if key.to_s != 'key'
     }
 
-    "#{result_string}key=#{sign_params[:key]}"
+    "#{result_string}key=#{key}"
   end
 
   def self.md5_sign(for_sign_string)
@@ -41,7 +43,7 @@ module Rwepay::Common
     Digest::SHA1.hexdigest(for_sign_string)
   end
 
-  def self.result_params_filter(sign_params)
+  def self.result_params_filter(sign_params, sort = true)
     result_string = ''
     #是否排序
     if sort
@@ -49,7 +51,8 @@ module Rwepay::Common
     end
 
     sign_params.each{|key,value|
-      result_string += (key.to_s + '=' + value.to_s + '&') if key.to_s != 'key'
+      encode_value = URI.escape(value.to_s, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+      result_string += (key.to_s + '=' + encode_value + '&') if key.to_s != 'key'
     }
     #去掉末尾的&
     result_string = result_string[0, result_string.length - 1]
