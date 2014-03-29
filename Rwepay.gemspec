@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["freezestart@gmail.com"]
   spec.summary       = "WeChat Pay gem"
   spec.description   = "WeChat Pay gem"
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/RaymondChou/Rwepay"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
