@@ -4,6 +4,7 @@ module Rwepay::Common
   require 'digest/md5'
   require 'securerandom'
   require 'uri'
+  require 'faraday'
 
   def self.configs_check(configs = {}, requires = [])
     requires.each do |require|
@@ -97,6 +98,87 @@ module Rwepay::Common
     md5_signed_string = md5_sign for_sign_string
 
     md5_signed_string
+  end
+
+  def self.send_deliver_notify(options = {}, access_token)
+    for_sign_data = {
+        :appid             => options[:app_id],
+        :appkey            => options[:app_key],
+        :openid            => options[:open_id],
+        :transid           => options[:trans_id],
+        :out_trade_no      => options[:out_trade_no],
+        :deliver_timestamp => options[:deliver_timestamp],
+        :deliver_status    => options[:deliver_status],
+        :deliver_msg       => options[:deliver_msg]
+    }
+
+    result_string = ''
+    sign_params = for_sign_data.sort
+
+    sign_params.each{|key,value|
+      result_string += (key.to_s + '=' + value.to_s + '&')
+    }
+    result_string = result_string[0, result_string.length - 1]
+
+    for_sign_data[:app_signature] = sha1_sign result_string
+    for_sign_data[:sign_method]   = 'sha1'
+
+    for_sign_data.delete :appkey
+
+    begin
+      conn = Faraday.new(:url => "https://api.weixin.qq.com/pay/delivernotify?access_token=#{access_token}")
+      response = conn.post do |req|
+        req.body = for_sign_data.to_json
+      end
+      response = JSON.parse response.body
+      if response['errcode'] == 0
+        return true, nil
+      else
+        return false, response
+      end
+    rescue => err
+      return false, err
+    end
+
+  end
+
+  def self.get_order_query(options = {}, access_token)
+    package = "out_trade_no=#{options[:out_trade_no]}&partner=#{options[:partner_id]}"
+    md5_package_sign = md5_sign "#{package}&key=#{options[:partner_key]}"
+    for_sign_data = {
+        :appid     => options[:app_id],
+        :appkey    => options[:app_key],
+        :package   => "#{package}&sign=#{md5_package_sign}",
+        :timestamp => get_timestamps
+    }
+
+    result_string = ''
+    sign_params = for_sign_data.sort
+
+    sign_params.each{|key,value|
+      result_string += (key.to_s + '=' + value.to_s + '&')
+    }
+    result_string = result_string[0, result_string.length - 1]
+
+    for_sign_data[:app_signature] = sha1_sign result_string
+    for_sign_data[:sign_method]   = 'sha1'
+
+    for_sign_data.delete :appkey
+
+    begin
+      conn = Faraday.new(:url => "https://api.weixin.qq.com/pay/orderquery?access_token=#{access_token}")
+      response = conn.post do |req|
+        req.body = for_sign_data.to_json
+      end
+      response = JSON.parse response.body
+      if response['errcode'] == 0
+        return true, response
+      else
+        return false, response
+      end
+    rescue => err
+      return false, err
+    end
   end
 
 end

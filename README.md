@@ -22,6 +22,8 @@ Or install it yourself as:
 
  示例中的账号信息是微信提供的测试数据，你需要使用自己的账号信息才可以完成测试：）
 
+ 具体参见[微信API文档](https://mp.weixin.qq.com/htmledition/res/bussiness-course2/wxpay-payment-api.pdf)
+
  特别要注意的一点，千万不要将微信提供的js demo使用在产品环境，那是非常不安全的。notify回调校验请严格使用notify_verify?方法进行。
 
 ## Contributing

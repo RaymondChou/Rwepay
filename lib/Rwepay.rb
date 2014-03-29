@@ -46,17 +46,32 @@ module Rwepay
       Rwepay::Common.notify_sign(params) == params['sign'] and params['trade_state'] == '0'
     end
 
-    def deliver_notify()
+    def deliver_notify(options = {})
+      options = Rwepay::Common.configs_check options,
+                [:access_token, :open_id, :trans_id, :out_trade_no, :deliver_timestamp, :deliver_status, :deliver_msg]
 
+      options[:app_id]  = @configs[:app_id]
+      options[:app_key] = @configs[:app_key]
+
+      Rwepay::Common.send_deliver_notify(options, options[:access_token])
     end
 
-    def order_query
+    def get_order_query(options = {})
+      options = Rwepay::Common.configs_check options,
+                [:access_token, :out_trade_no]
 
+      options[:app_id]      = @configs[:app_id]
+      options[:app_key]     = @configs[:app_key]
+      options[:partner_key] = @configs[:partner_key]
+      options[:partner_id]  = @configs[:partner_id]
+
+      Rwepay::Common.get_order_query(options, options[:access_token])
     end
 
 
   end
 
+  # @TODO
   class NativePayment
 
   end
