@@ -32,15 +32,82 @@ Or install it yourself as:
 
 ### JSPayment
 
+- 初始化 [new]
+
+`configs = {
+        :app_id => 'wxf8b4f85f3a794e77',
+        :partner_id => '1900000109',
+        :app_key => 'xxxx',
+        :partner_key => '8934e7d15453e97507ef794cf7b0519d'
+}
+payment = Rwepay::JSPayment.new configs
+`
+
 - 创建支付请求 [get_brand_request]
+options参数用于构建package，示例中写了必填参数，可选参数也可使用hash方式传入，参见文档。
+In Controller:
+`options = {
+        :body => '测试商品',
+        :notify_url => 'http://domain.com/to/path',
+        :out_trade_no => 'TEST123456',
+        :total_fee => '1',
+        :spbill_create_ip => '127.0.0.1',
+}
+@brand_json = js_payment.get_brand_request(options)
+`
+In View:
+`<%= link_to '微信支付', "javascript:void(0)", :id => 'wechat'  %>
+<script Language="javascript">
+  document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
+    $('#wechat').click(function(){
+      WeixinJSBridge.invoke('getBrandWCPayRequest', <%= raw @brand_json %>,function(res){
+        if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+          alert('支付成功!');
+        }else{
+          alert(res.err_msg);
+        }
+      });
+    });
+  }, false);
+</script>`
 
 - 回调验证 [notify_verify?]
 
+`status = payment.notify_verify?(params)
+if status
+      #这里请自行验证params[:total_fee]的值与订单是否相符，按需要存储其他内容特别是transaction_id
+      render :text => 'success'
+else
+      render :text => 'fail'
+end`
+
 - 发货通知 [deliver_notify]
+
+此接口调用需传入开放平台的access_token，由于access_token有时限且有请求限制，需要自行获取并按7200秒缓存，可使用下方的get_access_token方法
+`options = {
+        :access_token => access_token,
+        :open_id => 'oVGDVjni9uU30O9TGrlIWp-BcuYw',
+       :trans_id => '1217737101201403308373364651',
+       :out_trade_no => '1246154588',
+       :deliver_timestamp => Time.now.to_i.to_s,
+       :deliver_status => '1',
+       :deliver_msg => 'ok'
+}
+status, error = js_payment.deliver_notify(options)
+`
 
 - 获取订单状态 [get_order_query]
 
+`options = {
+        :access_token => access_token,
+        :out_trade_no => '1246154588'
+}
+status, response = js_payment.get_order_query(options)
+`
+
 - 获取access_token [get_access_token]
+
+`access_token = js_payment.get_access_token('your app_secret hear')`
 
 ### NativePayment
 
