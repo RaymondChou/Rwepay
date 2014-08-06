@@ -83,6 +83,22 @@ module Rwepay
       end
     end
 
+    def update_feedback(options = {})
+      options = Rwepay::Common.configs_check options,
+                                             [:access_token, :open_id, :feedback_id]
+      begin
+        response = Faraday.get("https://api.weixin.qq.com/payfeedback/update?access_token=#{options[:access_token]}&openid=#{options[:open_id]}&feedbackid=#{options[:feedback_id]}")
+        response = JSON.parse response.body
+        if response['errcode'] == 0
+          true
+        else
+          false
+        end
+      rescue
+        false
+      end
+    end
+
   end
 
   # @TODO
