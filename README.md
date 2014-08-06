@@ -110,6 +110,15 @@ In View:
 
 		access_token = js_payment.get_access_token('your app_secret hear')
 
+- 更新维权信息 [update_feedback]
+
+    options = {
+            :access_token => access_token,
+            :open_id      => open_id,
+            :feedback_id  => feedback_id
+    }
+    js_payment.update_feedback(options)
+
 ### NativePayment
 
   TODO
