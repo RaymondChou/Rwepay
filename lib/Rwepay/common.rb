@@ -143,7 +143,7 @@ module Rwepay::Common
     begin
       conn = Faraday.new(:url => "https://api.weixin.qq.com/pay/delivernotify?access_token=#{access_token}")
       response = conn.post do |req|
-        req.body = for_sign_data.to_json
+        req.body = for_sign_data.to_json.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")}
       end
       response = JSON.parse response.body
       if response['errcode'] == 0
@@ -183,7 +183,7 @@ module Rwepay::Common
     begin
       conn = Faraday.new(:url => "https://api.weixin.qq.com/pay/orderquery?access_token=#{access_token}")
       response = conn.post do |req|
-        req.body = for_sign_data.to_json
+        req.body = for_sign_data.to_json.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")}
       end
       response = JSON.parse response.body
       if response['errcode'] == 0
