@@ -35,10 +35,10 @@ Or install it yourself as:
 - 初始化 [new]
 
 		configs = {
-        	:app_id => 'wxf8b4f85f3a794e77',
-        	:partner_id => '1900000109',
+        	:appid => 'wxf8b4f85f3a794e77',
+        	:mch_id => '1900000109',
         	:app_key => 'xxxx',
-        	:partner_key => '8934e7d15453e97507ef794cf7b0519d'
+        	:key => '8934e7d15453e97507ef794cf7b0519d'
 		}
 		payment = Rwepay::JSPayment.new configs
 

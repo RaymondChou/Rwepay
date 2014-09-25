@@ -11,46 +11,63 @@ module Rwepay
 
     def initialize(configs = {})
       @configs = Rwepay::Common.configs_check configs,
-                                              [:app_id, :partner_id, :app_key, :partner_key]
+                                              [:appid, :mch_id, :key]
     end
 
     def get_brand_request(options = {})
-      brand_options = Rwepay::Common.configs_check options,
-                                                   [:body, :notify_url, :out_trade_no, :total_fee, :spbill_create_ip]
+      package_options = Rwepay::Common.configs_check options,
+                        [:body, :notify_url, :out_trade_no, :total_fee, :spbill_create_ip, :trade_type, :openid]
 
       # create package
-      brand_options[:key]       ||= @configs[:partner_key]
-      brand_options[:partner]   ||= @configs[:partner_id]
-      brand_options[:fee_type]  ||= '1'
-      brand_options[:bank_type] ||= 'WX'
-      brand_options[:input_charset] ||= 'GBK'
+      package_options[:key]       ||= @configs[:key]
+      package_options[:appid]     ||= @configs[:appid]
+      package_options[:mch_id]    ||= @configs[:mch_id]
+      package_options[:nonce_str] ||= Rwepay::Common.get_nonce_str
 
       final_params = Hash.new
-      final_params[:appId]     = @configs[:app_id]
+      final_params[:appId]     = package_options[:appid]
       final_params[:timeStamp] = Rwepay::Common.get_timestamps
       final_params[:nonceStr]  = Rwepay::Common.get_nonce_str
-      final_params[:package]   = Rwepay::Common.get_package(brand_options)
-      final_params[:signType]  = 'SHA1'
-      final_params[:paySign]   = Rwepay::Common.pay_sign(
-          :appid     => @configs[:app_id],
-          :appkey    => @configs[:app_key],
-          :noncestr  => final_params[:nonceStr],
+      final_params[:package]   = "prepay_id=#{Rwepay::Common.get_prepay_id(package_options)}"
+      final_params[:signType]  = 'MD5'
+
+      final_params[:paySign]   = Rwepay::Common.md5_sign(create_sign_string(
+          :appId     => final_params[:appId],
+          :timeStamp => final_params[:timeStamp],
+          :nonceStr  => final_params[:nonceStr],
           :package   => final_params[:package],
-          :timestamp => final_params[:timeStamp],
-      )
+          :signType  => final_params[:signType],
+          :key       => package_options[:key],
+      ))
+
       final_params.to_json
     end
 
-    def notify_verify?(params = {})
-      params['key'] ||= @configs[:partner_key]
-      Rwepay::Common.notify_sign(params) == params['sign'] and params['trade_state'] == '0'
+    def notify_verify?(xml)
+
+      xml_object = Nokogiri::XML.parse(xml).xpath('xml')
+
+      args = Hash.new
+
+      xml_object.children.each do |node|
+        args[node.name.to_s] = node.inner_text
+      end
+
+      args['key'] = @configs[:key]
+
+      if args['return_code'] == "SUCCESS" and args['result_code'].inner_text == "SUCCESS"
+        return Rwepay::Common.notify_sign(args) == args['sign'], args
+      else
+        return false, args
+      end
+
     end
 
     def deliver_notify(options = {})
       options = Rwepay::Common.configs_check options,
                                              [:access_token, :open_id, :trans_id, :out_trade_no, :deliver_timestamp, :deliver_status, :deliver_msg]
 
-      options[:app_id]  = @configs[:app_id]
+      options[:appid]  = @configs[:appid]
       options[:app_key] = @configs[:app_key]
 
       Rwepay::Common.send_deliver_notify(options, options[:access_token])
@@ -60,10 +77,10 @@ module Rwepay
       options = Rwepay::Common.configs_check options,
                                              [:access_token, :out_trade_no]
 
-      options[:app_id]      = @configs[:app_id]
+      options[:appid]      = @configs[:appid]
       options[:app_key]     = @configs[:app_key]
-      options[:partner_key] = @configs[:partner_key]
-      options[:partner_id]  = @configs[:partner_id]
+      options[:key] = @configs[:key]
+      options[:mch_id]  = @configs[:mch_id]
 
       Rwepay::Common.get_order_query(options, options[:access_token])
     end
@@ -71,7 +88,7 @@ module Rwepay
     # expire 7200 seconds, must be cached!
     def get_access_token(app_secret)
       begin
-        response = Faraday.get("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=#{@configs[:app_id]}&secret=#{app_secret}")
+        response = Faraday.get("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=#{@configs[:appid]}&secret=#{app_secret}")
         response = JSON.parse response.body
         if response['access_token'] != nil
           response['access_token']

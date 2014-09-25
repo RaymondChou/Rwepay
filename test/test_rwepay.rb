@@ -6,10 +6,10 @@ class TestRwepay < Test::Unit::TestCase
 
   def test_get_brand_request
     configs = {
-        :app_id => 'wxf8b4f85f3a794e77',
-        :partner_id => '1900000109',
+        :appid => 'wxf8b4f85f3a794e77',
+        :mch_id => '1900000109',
         :app_key => '2Wozy2aksie1puXUBpWD8oZxiD1DfQuEaiC7KcRATv1Ino3mdopKaPGQQ7TtkNySuAmCaDCrw4xhPY5qKTBl7Fzm0RgR3c0WaVYIXZARsxzHV2x7iwPPzOz94dnwPWSn',
-        :partner_key => '8934e7d15453e97507ef794cf7b0519d'
+        :key => '8934e7d15453e97507ef794cf7b0519d'
     }
 
     options = {
@@ -29,10 +29,10 @@ class TestRwepay < Test::Unit::TestCase
   #  params = "xxx"
   #
   #  configs = {
-  #      :app_id => 'wxf8b4f85f3a794e77',
-  #      :partner_id => '1900000109',
+  #      :appid => 'wxf8b4f85f3a794e77',
+  #      :mch_id => '1900000109',
   #      :app_key => '2Wozy2aksie1puXUBpWD8oZxiD1DfQuEaiC7KcRATv1Ino3mdopKaPGQQ7TtkNySuAmCaDCrw4xhPY5qKTBl7Fzm0RgR3c0WaVYIXZARsxzHV2x7iwPPzOz94dnwPWSn',
-  #      :partner_key => '8934e7d15453e97507ef794cf7b0519d'
+  #      :key => '8934e7d15453e97507ef794cf7b0519d'
   #  }
   #
   #  payment = Rwepay::JSPayment.new configs

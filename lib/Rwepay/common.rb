@@ -75,6 +75,49 @@ module Rwepay::Common
     return result_string
   end
 
+  def self.get_prepay_id(options = {})
+
+    n_builder = Nokogiri::XML::Builder.new do
+      xml do
+        appid            { cdata(options[:appid]) }
+        mch_id           { cdata(options[:mch_id]) }
+        nonce_str        { cdata(options[:nonce_str]) }
+        sign             { cdata(md5_sign(create_sign_string(options))) }
+        body             { cdata(options[:body]) }
+        out_trade_no     { cdata(options[:out_trade_no]) }
+        total_fee        { cdata(options[:total_fee]) }
+        spbill_create_ip { cdata(options[:spbill_create_ip]) }
+        notify_url       { cdata(options[:notify_url]) }
+        trade_type       { cdata(options[:trade_type]) }
+        openid           { cdata(options[:openid]) }
+      end
+    end
+
+    begin
+      conn = Faraday.new(:url => "https://api.mch.weixin.qq.com/pay/unifiedorder")
+      response = conn.post do |req|
+        req.body = n_builder.to_xml
+      end
+
+      xml_object = Nokogiri::XML.parse(response.body).xpath('xml')
+
+      return_code = xml_object.xpath('return_code').inner_text
+
+      if return_code == "SUCCESS"
+        result_code = xml_object.xpath('result_code').inner_text
+        if result_code == "SUCCESS"
+          return true, xml_object.xpath('prepay_id').inner_text
+        else
+          return false, response
+        end
+      else
+        return false, response
+      end
+    rescue => err
+      return false, err
+    end
+  end
+
   #get_package :bank_type, :body, :fee_type, :input_charset, :notify_url, :out_trade_no, :partner, :spbill_create_ip, :total_fee, :key
   def self.get_package(sign_params = {})
     for_sign_string   = create_sign_string sign_params
@@ -117,7 +160,7 @@ module Rwepay::Common
 
   def self.send_deliver_notify(options = {}, access_token)
     for_sign_data = {
-        :appid             => options[:app_id],
+        :appid             => options[:appid],
         :appkey            => options[:app_key],
         :openid            => options[:open_id],
         :transid           => options[:trans_id],
@@ -158,10 +201,10 @@ module Rwepay::Common
   end
 
   def self.get_order_query(options = {}, access_token)
-    package = "out_trade_no=#{options[:out_trade_no]}&partner=#{options[:partner_id]}"
-    md5_package_sign = md5_sign "#{package}&key=#{options[:partner_key]}"
+    package = "out_trade_no=#{options[:out_trade_no]}&partner=#{options[:mch_id]}"
+    md5_package_sign = md5_sign "#{package}&key=#{options[:key]}"
     for_sign_data = {
-        :appid     => options[:app_id],
+        :appid     => options[:appid],
         :appkey    => options[:app_key],
         :package   => "#{package}&sign=#{md5_package_sign}",
         :timestamp => get_timestamps
