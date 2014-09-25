@@ -31,7 +31,7 @@ module Rwepay
       final_params[:package]   = "prepay_id=#{Rwepay::Common.get_prepay_id(package_options)}"
       final_params[:signType]  = 'MD5'
 
-      final_params[:paySign]   = Rwepay::Common.md5_sign(create_sign_string(
+      final_params[:paySign]   = Rwepay::Common.md5_sign(Rwepay::Common.create_sign_string(
           :appId     => final_params[:appId],
           :timeStamp => final_params[:timeStamp],
           :nonceStr  => final_params[:nonceStr],
