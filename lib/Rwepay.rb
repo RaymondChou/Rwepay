@@ -43,7 +43,7 @@ module Rwepay
           :key       => package_options[:key],
       ))
 
-      return final_params.to_json, prepay_id
+      return final_params.to_json, succ, prepay_id
     end
 
     def notify_verify?(xml)
