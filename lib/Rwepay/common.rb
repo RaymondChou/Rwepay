@@ -143,7 +143,7 @@ module Rwepay::Common
     result_string = ''
     sign_params = params.sort
     sign_params.each do |key, value|
-      unless value.nil? or value == '' or key.to_s == 'key' or key.to_s == 'xml' or key.to_s == 'sign' or key.to_s == 'action'or key.to_s == 'controller'
+      unless value.nil? or value == '' or key.to_s == 'key' or key.to_s == 'xml' or key.to_s == 'sign' or key.to_s == 'action'or key.to_s == 'controller' or value == "\n" or value == '\n'
         result_string += (key.to_s + '=' + value.to_s + '&')
       end
     end
