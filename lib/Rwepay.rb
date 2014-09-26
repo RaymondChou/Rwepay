@@ -58,7 +58,7 @@ module Rwepay
 
       args['key'] = @configs[:key]
 
-      if args['return_code'] == "SUCCESS" and args['result_code'].inner_text == "SUCCESS"
+      if args['return_code'] == "SUCCESS" and args['result_code'] == "SUCCESS"
         return Rwepay::Common.notify_sign(args) == args['sign'], args
       else
         return false, args
