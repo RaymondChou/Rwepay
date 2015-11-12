@@ -75,6 +75,49 @@ module Rwepay::Common
     return result_string
   end
 
+  def self.get_code_url(options = {})
+
+    n_builder = Nokogiri::XML::Builder.new do
+      xml do
+        appid            { cdata(options[:appid]) }
+        mch_id           { cdata(options[:mch_id]) }
+        nonce_str        { cdata(options[:nonce_str]) }
+        sign             { cdata(md5_sign(create_sign_string(options))) }
+        body             { cdata(options[:body]) }
+        out_trade_no     { cdata(options[:out_trade_no]) }
+        total_fee        { cdata(options[:total_fee]) }
+        spbill_create_ip { cdata(options[:spbill_create_ip]) }
+        notify_url       { cdata(options[:notify_url]) }
+        trade_type       { cdata(options[:trade_type]) }
+        product_id       { cdata(options[:product_id]) }
+      end
+    end
+
+    begin
+      conn = Faraday.new(:url => "https://api.mch.weixin.qq.com/pay/unifiedorder")
+      response = conn.post do |req|
+        req.body = n_builder.to_xml
+      end
+
+      xml_object = Nokogiri::XML.parse(response.body).xpath('xml')
+
+      return_code = xml_object.xpath('return_code').inner_text
+
+      if return_code == "SUCCESS"
+        result_code = xml_object.xpath('result_code').inner_text
+        if result_code == "SUCCESS"
+          return true, xml_object.xpath('code_url').inner_text
+        else
+          return false, response
+        end
+      else
+        return false, response
+      end
+    rescue => err
+      return false, err
+    end
+  end
+
   def self.get_prepay_id(options = {})
 
     n_builder = Nokogiri::XML::Builder.new do

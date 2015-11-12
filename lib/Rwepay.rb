@@ -14,6 +14,21 @@ module Rwepay
                                               [:appid, :mch_id, :key]
     end
 
+    def get_code_url(options = {})
+      package_options = Rwepay::Common.configs_check options,
+                                                     [:body, :notify_url, :out_trade_no, :total_fee, :spbill_create_ip, :trade_type, :product_id]
+
+      # create package
+      package_options[:key]       ||= @configs[:key]
+      package_options[:appid]     ||= @configs[:appid]
+      package_options[:mch_id]    ||= @configs[:mch_id]
+      package_options[:nonce_str] ||= Rwepay::Common.get_nonce_str
+
+      succ, code_url = Rwepay::Common.get_code_url(package_options)
+
+      return succ, code_url
+    end
+
     def get_brand_request(options = {})
       package_options = Rwepay::Common.configs_check options,
                         [:body, :notify_url, :out_trade_no, :total_fee, :spbill_create_ip, :trade_type, :openid]
